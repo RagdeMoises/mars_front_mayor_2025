@@ -45,7 +45,7 @@ const ProductCard = ({ product }) => {
 
       <img 
         // src={product.image || 'https://back-production-8f9a.up.railway.app/images/esqueleto.jpg'} 
-        src={"https://backmars2025-production.up.railway.app/images/"+product.id+".jpg" || 'https://backmars2025-production.up.railway.app/images/esqueleto.jpg'} 
+        src={"https://backmars2025-production.up.railway.app/images/"+product.sku+".jpg" || 'https://backmars2025-production.up.railway.app/images/esqueleto.jpg'} 
         alt={product.titulo}
         className="w-[90%] h-48 object-cover m-4"
         onError={(e) => { e.target.onerror = null; e.target.src = 'https://backmars2025-production.up.railway.app/images/esqueleto.jpg'; }}
@@ -80,7 +80,7 @@ const ProductCard = ({ product }) => {
               <button 
                 onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
                 disabled={quantity <= 1}
-                className="bg-gray-100 px-2 py-1 rounded disabled:opacity-50"
+                className="text-gray-600 bg-gray-100 px-2 py-1 rounded disabled:opacity-50"
               >
                 -
               </button>
