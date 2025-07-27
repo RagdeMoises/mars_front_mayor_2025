@@ -130,7 +130,7 @@ const CartPage = () => {
         }))
       }),
     });
-    console.log(response);
+    //console.log(response);
 
     if (response.ok) {
       alert('Pedido enviado correctamente a tu correo');
@@ -195,7 +195,7 @@ const CartPage = () => {
         shouldCloseOnOverlayClick={!isLoading}
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-800">Confirmación de compra</h2>
+          <h2 className="text-xl font-bold text-gray-800">Confirmación de Pedido</h2>
           {!isLoading && (
             <button 
               onClick={() => setIsModalOpen(false)}
@@ -216,8 +216,21 @@ const CartPage = () => {
         ) : (
           <form onSubmit={handleSubmitEmail}>
             <div className="mb-4">
+              <label htmlFor="email1" className="block text-sm font-medium text-gray-700 mb-2">
+                Correo electrónico de la tienda
+              </label>
+              <input
+                type="email"
+                id="email1"
+                value="coop.mars@outlook.com"
+                //onChange={(e) => setEmail(e.target.value)}
+                className="text-blue-600 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                placeholder="tucorreo@ejemplo.com"
+                disabled={true}
+              />
+
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Correo electrónico
+                Ingrese su Correo electrónico (Cliente)
               </label>
               <input
                 type="email"
@@ -241,7 +254,7 @@ const CartPage = () => {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                  className="text-gray-600 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
                 >
                   Cancelar
                 </button>
@@ -251,7 +264,7 @@ const CartPage = () => {
                 className={`px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors ${isLoading ? 'opacity-75 cursor-not-allowed' : ''}`}
                 disabled={isLoading}
               >
-                {isLoading ? 'Enviando...' : 'Confirmar compra'}
+                {isLoading ? 'Enviando...' : 'Confirmar Pedido'}
               </button>
             </div>
           </form>
@@ -277,10 +290,10 @@ const CartPage = () => {
           {cartItems.map((item) => (
             <div key={item.id} className="p-4 flex flex-col sm:flex-row">
               <img
-                src={`https://back-production-8f9a.up.railway.app/images/${item.id}.jpg` || 'https://back-production-8f9a.up.railway.app/images/esqueleto.jpg'} 
+                src={`https://backmars2025-production.up.railway.app/images/${item.id}.jpg` || 'https://backmars2025-production.up.railway.app/images/esqueleto.jpg'} 
                 alt={item.title}
                 className="w-full sm:w-32 h-32 object-contain bg-gray-100 rounded-lg mb-4 sm:mb-0"
-                onError={(e) => { e.target.onerror = null; e.target.src = 'https://back-production-8f9a.up.railway.app/images/esqueleto.jpg'; }}
+                onError={(e) => { e.target.onerror = null; e.target.src = 'https://backmars2025-production.up.railway.app/images/esqueleto.jpg'; }}
               />
               
               <div className="flex-1 sm:ml-6">
@@ -325,10 +338,14 @@ const CartPage = () => {
             <span className="text-gray-600 font-medium">${cartTotal.toFixed(2)}</span>
           </div>
           
-          <div className="flex justify-between mb-2">
+          {/* <div className="flex justify-between mb-2">
             <span className="text-gray-600">Envío</span>
             <span className="text-gray-600 font-medium">Gratis</span>
+<<<<<<< HEAD
           </div>
+=======
+          </div> */}
+>>>>>>> 6838f98 (modificacion de moises)
           
           <div className="border-t border-gray-200 my-4"></div>
           
