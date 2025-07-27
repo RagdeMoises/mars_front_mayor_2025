@@ -291,7 +291,7 @@ const CartPage = () => {
                 
                 <p className="text-sm text-gray-500 mt-1">SKU: {item.sku}</p>
                 
-                <div className="mt-4 flex items-center">
+                <div className="text-gray-600 mt-4 flex items-center">
                   <label htmlFor={`quantity-${item.id}`} className="sr-only">Cantidad</label>
                   <input
                     id={`quantity-${item.id}`}
@@ -322,17 +322,17 @@ const CartPage = () => {
           
           <div className="flex justify-between mb-2">
             <span className="text-gray-600">Subtotal</span>
-            <span className="font-medium">${cartTotal.toFixed(2)}</span>
+            <span className="text-gray-600 font-medium">${cartTotal.toFixed(2)}</span>
           </div>
           
           <div className="flex justify-between mb-2">
             <span className="text-gray-600">Envío</span>
-            <span className="font-medium">Gratis</span>
+            <span className="text-gray-600 font-medium">Gratis</span>
           </div>
           
           <div className="border-t border-gray-200 my-4"></div>
           
-          <div className="flex justify-between text-lg font-bold mb-6">
+          <div className="text-gray-600 flex justify-between text-lg font-bold mb-6">
             <span>Total</span>
             <span>${cartTotal.toFixed(2)}</span>
           </div>
@@ -341,7 +341,7 @@ const CartPage = () => {
             onClick={handleProceedToCheckout}
             className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg mb-3 transition-colors"
           >
-            Proceder al pago
+            Proceder con el pedido
           </button>
           
           <button
