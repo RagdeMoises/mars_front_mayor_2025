@@ -197,7 +197,7 @@ const CatalogPage = () => {
               onChange={handleSearchChange}
               onKeyDown={handleKeyDown}
               placeholder="Buscar productos por nombre, SKU o código de barras..."
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="text-gray-600 w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
