@@ -132,7 +132,7 @@ const ProductDetailPage = () => {
           <p className={`${product.stock > 0 ? 'text-green-600' : 'text-red-600 font-bold'}`}>
             {product.stock > 0 
               ? `Disponible (${product.stock} unidades)` 
-              : 'Producto agotado'}
+              : 'Producto Sin Stock'}
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-6 border-y">
