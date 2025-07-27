@@ -11,18 +11,18 @@ const Footer = () => {
               Tu destino para encontrar los mejores productos al mejor precio.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="text-gray-300 hover:text-blue-400 transition-colors">
+              <a href="https://www.facebook.com/Mars31505/" className="text-gray-300 hover:text-blue-400 transition-colors">
                 <FaFacebook size={20} />
               </a>
               <a href="https://www.instagram.com/tienda_mars_arg/?hl=en" className="text-gray-300 hover:text-blue-400 transition-colors">
                 <FaInstagram size={20} />
               </a>
-              <a href="#" className="text-gray-300 hover:text-blue-400 transition-colors">
+              {/* <a href="#" className="text-gray-300 hover:text-blue-400 transition-colors">
                 <FaTwitter size={20} />
               </a>
               <a href="#" className="text-gray-300 hover:text-blue-400 transition-colors">
                 <FaLinkedin size={20} />
-              </a>
+              </a> */}
             </div>
           </div>
 
@@ -50,11 +50,11 @@ const Footer = () => {
           <div>
             <h3 className="text-xl text-blue-400 mb-4">Contacto</h3>
             <address className="not-italic text-gray-300 space-y-2">
-              <p>contacto@tiendasmars.com</p>
-              <p>+1 234 567 890</p>
+              <p>coop.mars@outlook.com</p>
+              <p>+54 911 33269355</p>
               <p>
-                Av. Principal 1234<br />
-                Garin, Argentina
+                Av. Villanueva 1043<br />
+                Ing. Maschwitz, Buenos Aires, Argentina
               </p>
             </address>
           </div>
