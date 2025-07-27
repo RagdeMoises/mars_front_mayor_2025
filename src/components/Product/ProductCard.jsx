@@ -45,10 +45,10 @@ const ProductCard = ({ product }) => {
 
       <img 
         // src={product.image || 'https://back-production-8f9a.up.railway.app/images/esqueleto.jpg'} 
-        src={"https://back-production-8f9a.up.railway.app/images/"+product.id+".jpg" || 'https://back-production-8f9a.up.railway.app/images/esqueleto.jpg'} 
+        src={"https://backmars2025-production.up.railway.app/images/"+product.id+".jpg" || 'https://backmars2025-production.up.railway.app/images/esqueleto.jpg'} 
         alt={product.titulo}
         className="w-[90%] h-48 object-cover m-4"
-        onError={(e) => { e.target.onerror = null; e.target.src = 'https://back-production-8f9a.up.railway.app/images/esqueleto.jpg'; }}
+        onError={(e) => { e.target.onerror = null; e.target.src = 'https://backmars2025-production.up.railway.app/images/esqueleto.jpg'; }}
       />
       
       <div className="p-4">
@@ -71,7 +71,7 @@ const ProductCard = ({ product }) => {
         )}
         
         <p className={`mb-3 ${product.stock > 0 ? 'text-green-600' : 'text-red-600 font-bold'}`}>
-          {product.stock > 0 ? `Disponible: ${product.stock}` : 'Agotado'}
+          {product.stock > 0 ? `Disponible: ${product.stock}` : 'Sin Stock'}
         </p>
         
         {product.stock > 0 && (
