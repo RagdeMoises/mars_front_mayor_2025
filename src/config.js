@@ -1,4 +1,4 @@
-const baseURL = 'http://192.168.1.132:4000/api';
+const baseURL = 'https://backmars2025-production.up.railway.app/api';
 
 const config = {
   novedadesApi: `${baseURL}/novedades`,
