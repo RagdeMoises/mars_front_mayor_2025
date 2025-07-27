@@ -76,7 +76,7 @@ const ProductCard = ({ product }) => {
         
         {product.stock > 0 && (
           <div className="space-y-2">
-            <div className="flex items-center justify-between border border-gray-200 rounded px-2 py-1">
+            <div className="text-gray-600 flex items-center justify-between border border-gray-200 rounded px-2 py-1">
               <button 
                 onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
                 disabled={quantity <= 1}
