@@ -46,7 +46,7 @@ const CatalogPage = () => {
       if (!response.ok) throw new Error('Error al cargar productos');
       
       const data = await response.json();
-      console.log(data)
+      //console.log(data)
       return data;
     } catch (error) {
       console.error('Error fetching products:', error);
