@@ -15,8 +15,8 @@ const HomePage = () => {
       //const res = await fetch('http://192.168.1.132:4000/api/novedades');
       const res = await fetch(config.novedadesApi);
       const data = await res.json();
-      console.log("fetchNovedades")
-      console.log(data)
+      //console.log("fetchNovedades")
+      //console.log(data)
       setFeaturedProducts(data);
     } catch (err) {
       console.error('Error al obtener novedades:', err);
@@ -29,8 +29,8 @@ const HomePage = () => {
       const res = await fetch(config.ofertasApi);
       const data = await res.json();
       setOnSaleProducts(data);
-      console.log("fetchOfertas")
-      console.log(data)
+      //console.log("fetchOfertas")
+      //console.log(data)
     } catch (err) {
       console.error('Error al obtener ofertas:', err);
     }
