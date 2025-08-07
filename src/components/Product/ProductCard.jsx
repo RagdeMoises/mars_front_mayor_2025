@@ -44,8 +44,8 @@ const ProductCard = ({ product }) => {
       )}
 
       <img 
-        // src={product.image || 'https://back-production-8f9a.up.railway.app/images/esqueleto.jpg'} 
-        src={"https://backmars2025-production.up.railway.app/images/"+product.sku+".jpg" || 'https://backmars2025-production.up.railway.app/images/esqueleto.jpg'} 
+        // src={product.image || 'https://backmars2025-production.up.railway.app/images/esqueleto.jpg'} 
+        src={"https://backmars2025-production.up.railway.app/images/"+product.id+".jpg" || 'https://backmars2025-production.up.railway.app/images/esqueleto.jpg'} 
         alt={product.titulo}
         className="w-[90%] h-48 object-cover m-4"
         onError={(e) => { e.target.onerror = null; e.target.src = 'https://backmars2025-production.up.railway.app/images/esqueleto.jpg'; }}
@@ -58,7 +58,7 @@ const ProductCard = ({ product }) => {
         </span>
         
         <h3 className="text-lg font-semibold text-gray-800 mb-1">{product.titulo}</h3>
-        <p className="text-xs text-gray-500 mb-1">SKU: {product.sku}</p>
+        <p className="text-xs text-gray-500 mb-1">SKU: {product.id}</p>
         
         {/* Mostrar precio especial si existe */}
         {product.precio_especial && product.precio_especial !== "0.00" ? (
@@ -80,7 +80,7 @@ const ProductCard = ({ product }) => {
               <button 
                 onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
                 disabled={quantity <= 1}
-                className="text-gray-600 bg-gray-100 px-2 py-1 rounded disabled:opacity-50"
+                className="bg-gray-100 px-2 py-1 rounded disabled:opacity-50"
               >
                 -
               </button>
