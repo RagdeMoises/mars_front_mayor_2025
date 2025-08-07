@@ -197,7 +197,7 @@ const CartPage = () => {
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 placeholder="tucorreo@ejemplo.com"
                 required
                 disabled={isLoading}
@@ -212,7 +212,7 @@ const CartPage = () => {
                 id="clientName"
                 value={clientName}
                 onChange={(e) => setClientName(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Nombre completo"
                 disabled={isLoading}
               />
@@ -225,7 +225,7 @@ const CartPage = () => {
                 id="clientPhone"
                 value={clientPhone}
                 onChange={(e) => setClientPhone(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Número de contacto"
                 disabled={isLoading}
               />
@@ -237,7 +237,7 @@ const CartPage = () => {
                 id="observations"
                 value={observations}
                 onChange={(e) => setObservations(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Alguna observación sobre el pedido"
                 rows="3"
                 disabled={isLoading}
