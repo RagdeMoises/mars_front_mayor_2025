@@ -21,6 +21,8 @@ const CatalogPage = () => {
     sortBy: ''
   });
 
+  console.log(products);
+
   const productsPerPage = 12;
   //const API_URL = 'http://192.168.1.132:4000/api/productos/paginated';
   const API_URL = config.paginatedApi;
@@ -215,9 +217,9 @@ const CatalogPage = () => {
           {products.length > 0 ? (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {products.map((product) => (
+                {products.map((product, index) => (
                   <ProductCard 
-                    key={`${product.id}`} 
+                    key={`${product.id}_${product.sku}_${index}`}
                     product={product} 
                   />
                 ))}
