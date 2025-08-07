@@ -16,6 +16,9 @@ const CartPage = () => {
   } = useCart();
 
   const [email, setEmail] = useState('');
+  const [clientName, setClientName] = useState('');
+  const [clientPhone, setClientPhone] = useState('');
+  const [observations, setObservations] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -40,7 +43,10 @@ const CartPage = () => {
     
     // Agregar resumen
     const summary = [
-      ['TOTAL:', `$${cartTotal.toFixed(2)}`]
+      ['TOTAL:', `$${cartTotal.toFixed(2)}`],
+      ['Cliente:', clientName],
+      ['Teléfono:', clientPhone],
+      ['Observaciones:', observations]
     ];
     const summarySheet = XLSX.utils.aoa_to_sheet(summary);
     XLSX.utils.book_append_sheet(workbook, summarySheet, "Resumen");
@@ -53,98 +59,53 @@ const CartPage = () => {
     setSuccessMessage('');
   };
 
-  // const handleSubmitEmail = async (e) => {
-  //   e.preventDefault();
-  //   setIsLoading(true);
-  //   setEmailError('');
-    
-  //   // Validación de email
-  //   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-  //     setEmailError('Por favor ingrese un correo electrónico válido');
-  //     setIsLoading(false);
-  //     return;
-  //   }
-    
-  //   try {
-  //     // Generar el Excel
-  //     const excelData = generateExcel();
-      
-  //     // Simular envío al backend (en producción, harías una llamada real a tu API)
-  //     await new Promise(resolve => setTimeout(resolve, 1500));
-      
-  //     // Crear enlace para descarga (simulación)
-  //     const blob = new Blob([excelData], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-  //     const url = URL.createObjectURL(blob);
-  //     const a = document.createElement('a');
-  //     a.href = url;
-  //     a.download = `Carrito_${new Date().toISOString().slice(0, 10)}.xlsx`;
-  //     document.body.appendChild(a);
-  //     a.click();
-  //     document.body.removeChild(a);
-      
-  //     // Mostrar mensaje de éxito
-  //     setSuccessMessage(`Se ha enviado el carrito a ${email}`);
-      
-  //     // Limpiar después de 3 segundos
-  //     setTimeout(() => {
-  //       setIsModalOpen(false);
-  //       setEmail('');
-  //       clearCart();
-  //       setSuccessMessage('');
-  //     }, 3000);
-      
-  //   } catch (error) {
-  //     console.error('Error:', error);
-  //     setEmailError('Ocurrió un error al procesar tu solicitud');
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
   const handleSubmitEmail = async (e) => {
-  e.preventDefault();
-  
-  if (!email.includes('@') || !email.includes('.')) {
-    setEmailError('Por favor ingrese un correo electrónico válido');
-    return;
-  }
-  
-  setEmailError('');
-  
-  try {
-    // const response = await fetch('http://192.168.1.132:4000/api/send-cart', {
-    const response = await fetch(config.sendcartApi, {
-    //const response = await fetch('https://api.example.com/send-cart', {      
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email,
-        cartItems: cartItems.map(item => ({
-          Producto: item.title,
-          SKU: item.sku,
-          Precio: item.price,
-          Cantidad: item.quantity,
-          Subtotal: (item.price * item.quantity).toFixed(2)
-        }))
-      }),
-    });
-    //console.log(response);
-
-    if (response.ok) {
-      alert('Pedido enviado correctamente a tu correo');
-      setIsModalOpen(false);
-      setEmail('');
-      clearCart();
-    } else {
-      throw new Error('Error al enviar el pedido');
+    e.preventDefault();
+    
+    if (!email.includes('@') || !email.includes('.')) {
+      setEmailError('Por favor ingrese un correo electrónico válido');
+      return;
     }
-  } catch (error) {
-    console.error(error);
-    setEmailError('Error al enviar el pedido. Por favor intente nuevamente.');
-  }
-};
+    
+    setEmailError('');
+    
+    try {
+      const response = await fetch(config.sendcartApi, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          clientName,
+          clientPhone,
+          observations,
+          cartItems: cartItems.map(item => ({
+            Producto: item.title,
+            SKU: item.sku,
+            Precio: item.price,
+            Cantidad: item.quantity,
+            Subtotal: (item.price * item.quantity).toFixed(2)
+          }))
+        }),
+      });
+
+      if (response.ok) {
+        alert('Pedido enviado correctamente a tu correo');
+        setIsModalOpen(false);
+        setEmail('');
+        setClientName('');
+        setClientPhone('');
+        setObservations('');
+        clearCart();
+      } else {
+        throw new Error('Error al enviar el pedido');
+      }
+    } catch (error) {
+      console.error(error);
+      setEmailError('Error al enviar el pedido. Por favor intente nuevamente.');
+    }
+  };
 
   // Estilos para el modal
   const customStyles = {
@@ -223,14 +184,13 @@ const CartPage = () => {
                 type="email"
                 id="email1"
                 value="coop.mars@outlook.com"
-                //onChange={(e) => setEmail(e.target.value)}
                 className="text-blue-600 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 placeholder="tucorreo@ejemplo.com"
                 disabled={true}
               />
 
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Ingrese su Correo electrónico (Cliente)
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2 mt-4">
+                Ingrese su Correo electrónico (Cliente)*
               </label>
               <input
                 type="email"
@@ -243,10 +203,49 @@ const CartPage = () => {
                 disabled={isLoading}
               />
               {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
+
+              <label htmlFor="clientName" className="block text-sm font-medium text-gray-700 mb-2 mt-4">
+                Nombre del cliente (opcional)
+              </label>
+              <input
+                type="text"
+                id="clientName"
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Nombre completo"
+                disabled={isLoading}
+              />
+
+              <label htmlFor="clientPhone" className="block text-sm font-medium text-gray-700 mb-2 mt-4">
+                Teléfono/Celular (opcional)
+              </label>
+              <input
+                type="tel"
+                id="clientPhone"
+                value={clientPhone}
+                onChange={(e) => setClientPhone(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Número de contacto"
+                disabled={isLoading}
+              />
+
+              <label htmlFor="observations" className="block text-sm font-medium text-gray-700 mb-2 mt-4">
+                Observaciones (opcional)
+              </label>
+              <textarea
+                id="observations"
+                value={observations}
+                onChange={(e) => setObservations(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Alguna observación sobre el pedido"
+                rows="3"
+                disabled={isLoading}
+              />
             </div>
             
             <p className="text-sm text-gray-500 mb-6">
-              Te enviaremos un resumen de tu compra a este correo electrónico.
+              * Campos obligatorios
             </p>
             
             <div className="flex justify-end space-x-3">
@@ -337,13 +336,6 @@ const CartPage = () => {
             <span className="text-gray-600">Subtotal</span>
             <span className="text-gray-600 font-medium">${cartTotal.toFixed(2)}</span>
           </div>
-          
-          {/* <div className="flex justify-between mb-2">
-            <span className="text-gray-600">Envío</span>
-            <span className="text-gray-600 font-medium">Gratis</span>
-          </div>
-          </div> */}
-
           
           <div className="border-t border-gray-200 my-4"></div>
           
