@@ -47,9 +47,9 @@ export const CartProvider = ({ children }) => {
       type: 'ADD_ITEM',
       payload: {
         id: product.id,
-        sku: product.sku,
+        sku: product.id,
         title: product.titulo,
-        price: parseFloat(product.precio_minorista),
+        price: parseFloat(product.precio_mayorista),
         quantity,
         image: product.image || '/default-product.jpg',
         stock: product.stock
