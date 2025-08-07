@@ -341,11 +341,9 @@ const CartPage = () => {
           {/* <div className="flex justify-between mb-2">
             <span className="text-gray-600">Envío</span>
             <span className="text-gray-600 font-medium">Gratis</span>
-<<<<<<< HEAD
           </div>
-=======
           </div> */}
->>>>>>> 6838f98 (modificacion de moises)
+
           
           <div className="border-t border-gray-200 my-4"></div>
           
