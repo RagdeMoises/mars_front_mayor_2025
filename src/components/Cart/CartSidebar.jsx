@@ -82,7 +82,7 @@ const CartSidebar = () => {
                     <div key={item.id} className="flex gap-4 py-4 border-b">
                       <img 
                         //src={item.image} 
-                        src={"https://backmars2025-production.up.railway.app/images/"+item.id+".jpg" || 'https://backmars2025-production.up.railway.app/images/esqueleto.jpg'} 
+                        src={"https://backmars2025-production.up.railway.app/images/"+item.sku+".jpg" || 'https://backmars2025-production.up.railway.app/images/esqueleto.jpg'} 
                         alt={item.title} 
                         className="w-20 h-20 object-cover rounded"
                       />
