@@ -34,7 +34,7 @@ const ProductCard = ({ product }) => {
   };
 
   const productType = getProductType();
-  const productImage = "https://backmars2025-production.up.railway.app/images/"+product.id+".jpg" || 'https://backmars2025-production.up.railway.app/images/esqueleto.jpg';
+  const productImage = "https://backmars2025-production.up.railway.app/images/"+product.sku+".jpg" || 'https://backmars2025-production.up.railway.app/images/esqueleto.jpg';
 
   return (
     <>
