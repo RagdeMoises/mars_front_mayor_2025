@@ -21,15 +21,14 @@ const CatalogPage = () => {
     sortBy: ''
   });
 
-  console.log(products);
+  const [searchInput, setSearchInput] = useState("");
 
   const productsPerPage = 12;
-  //const API_URL = 'http://192.168.1.132:4000/api/productos/paginated';
   const API_URL = config.paginatedApi;
   const searchTimeoutRef = useRef(null);
-
+  const scrollDebounceRef = useRef(null);
+  console.log("products:", products);
   const fetchProducts = async (pageNumber = 1, filters = {}) => {
-    //console.log(fetchProducts)
     try {
       const queryParams = new URLSearchParams({
         page: pageNumber,
@@ -41,14 +40,12 @@ const CatalogPage = () => {
         max_price: filters.priceRange[1],
         ...(filters.productTypes.length > 0 && { productTypes: filters.productTypes.join(',') })
       });
-      //console.log(queryParams)
-      //console.log(filters)
+
       const response = await fetch(`${API_URL}?${queryParams}`);
       
       if (!response.ok) throw new Error('Error al cargar productos');
       
       const data = await response.json();
-      //console.log(data)
       return data;
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -58,7 +55,6 @@ const CatalogPage = () => {
 
   const fetchCategorias = async () => {
     try {
-      //const res = await fetch('http://192.168.1.132:4000/api/categorias');
       const res = await fetch(config.categoriasApi);
       const data = await res.json();
       setCategories(data);
@@ -109,18 +105,28 @@ const CatalogPage = () => {
       const nextPage = page + 1;
       const data = await fetchProducts(nextPage, filters);
       
-      setProducts(prev => [...prev, ...(data.data || [])]);
-      setHasMore(data.pagination?.hasNextPage || false);
-      setPage(nextPage);
-      setTotalProducts(data.pagination?.totalItems || totalProducts);
+      // Filtrar productos duplicados
+      const newProducts = data.data || [];
+      const existingIds = new Set(products.map(p => p.id));
+      const uniqueNewProducts = newProducts.filter(product => !existingIds.has(product.id));
+      
+      if (uniqueNewProducts.length > 0) {
+        setProducts(prev => [...prev, ...uniqueNewProducts]);
+        setHasMore(data.pagination?.hasNextPage || false);
+        setPage(nextPage);
+        setTotalProducts(data.pagination?.totalItems || totalProducts);
+      } else {
+        // Si todos los productos son duplicados, asumimos que no hay más
+        setHasMore(false);
+      }
     } catch (error) {
       setError(error.message || 'Error al cargar más productos');
     } finally {
       setLoadingMore(false);
     }
-  }, [page, hasMore, loadingMore, filters, totalProducts]);
+  }, [page, hasMore, loadingMore, filters, totalProducts, products]);
 
-  // Scroll infinito optimizado
+  // Scroll infinito con debounce
   useEffect(() => {
     const handleScroll = () => {
       if (
@@ -130,19 +136,24 @@ const CatalogPage = () => {
         !loadingMore &&
         hasMore
       ) {
-        loadMoreProducts();
+        if (scrollDebounceRef.current) {
+          clearTimeout(scrollDebounceRef.current);
+        }
+        
+        scrollDebounceRef.current = setTimeout(() => {
+          loadMoreProducts();
+        }, 200);
       }
     };
 
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollDebounceRef.current) {
+        clearTimeout(scrollDebounceRef.current);
+      }
+    };
   }, [loading, loadingMore, hasMore, loadMoreProducts]);
-
-  // const handleSearchChange = (e) => {
-  //   setFilters(prev => ({ ...prev, searchQuery: e.target.value }));
-  // };
-
-  const [searchInput, setSearchInput] = useState("");
 
   const handleSearchChange = (e) => {
     setSearchInput(e.target.value);
@@ -153,7 +164,6 @@ const CatalogPage = () => {
       setFilters(prev => ({ ...prev, searchQuery: searchInput }));
     }
   };
-
 
   if (loading && page === 1) {
     return (
@@ -178,7 +188,6 @@ const CatalogPage = () => {
       
       <div className="flex flex-col md:flex-row gap-8">
         <FilterSidebar 
-          // categories={[...new Set(products.map(p => p.categoria))]} 
           categories={categories}
           filters={filters}
           setFilters={setFilters}
@@ -186,13 +195,6 @@ const CatalogPage = () => {
         
         <div className="flex-1">
           <div className="mb-6">
-            {/* <input
-              type="text"
-              placeholder="Buscar productos por nombre, SKU o código de barras..."
-              value={filters.searchQuery}
-              onChange={handleSearchChange}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            /> */}
             <input
               type="text"
               value={searchInput}
@@ -217,9 +219,9 @@ const CatalogPage = () => {
           {products.length > 0 ? (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {products.map((product, index) => (
+                {products.map((product) => (
                   <ProductCard 
-                    key={`${product.id}_${product.sku}_${index}`}
+                    key={`${product.id}_${product.sku}_${product.updatedAt || ''}`}
                     product={product} 
                   />
                 ))}
