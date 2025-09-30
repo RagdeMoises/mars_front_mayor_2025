@@ -11,6 +11,7 @@ const FilterSidebar = ({ categories, filters, setFilters }) => {
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [categorySearch, setCategorySearch] = useState('');
+  const [hideOutOfStock, setHideOutOfStock] = useState(true); // Nuevo estado para ocultar sin stock
 
   const productTypes = [
     { value: 1, label: 'Novedades', color: 'bg-blue-500' },
@@ -29,6 +30,10 @@ const FilterSidebar = ({ categories, filters, setFilters }) => {
       setSelectedCategories(filters.category ? filters.category.split(',') : []);
     }
     if (filters.productTypes) setSelectedTypes(filters.productTypes);
+    // Inicializar el filtro de stock desde los filtros existentes
+    if (filters.hideOutOfStock !== undefined) {
+      setHideOutOfStock(filters.hideOutOfStock);
+    }
   }, [filters]);
 
   const handlePriceChange = (value) => {
@@ -66,17 +71,26 @@ const FilterSidebar = ({ categories, filters, setFilters }) => {
     setFilters({ ...filters, sortBy: e.target.value });
   };
 
+  // Nuevo manejador para el filtro de stock
+  const handleStockFilterChange = (e) => {
+    const shouldHideOutOfStock = e.target.checked;
+    setHideOutOfStock(shouldHideOutOfStock);
+    setFilters({ ...filters, hideOutOfStock: shouldHideOutOfStock });
+  };
+
   const resetFilters = () => {
     setPriceRange([0, 150000]);
     setSelectedCategories([]);
     setSelectedTypes([]);
     setCategorySearch('');
+    setHideOutOfStock(true); // Resetear a true por defecto
     setFilters({
       searchQuery: '',
       category: '',
       priceRange: [0, 150000],
       productTypes: [],
-      sortBy: ''
+      sortBy: '',
+      hideOutOfStock: true // Incluir en el reset
     });
   };
 
@@ -86,7 +100,8 @@ const FilterSidebar = ({ categories, filters, setFilters }) => {
 
   const activeFilterCount = selectedCategories.length + selectedTypes.length + 
     (filters.sortBy ? 1 : 0) + 
-    (filters.priceRange[0] !== 0 || filters.priceRange[1] !== 150000 ? 1 : 0);
+    (filters.priceRange[0] !== 0 || filters.priceRange[1] !== 150000 ? 1 : 0) +
+    (!hideOutOfStock ? 1 : 0); // Contar el filtro de stock cuando está desactivado
 
   return (
     <>
@@ -138,11 +153,26 @@ const FilterSidebar = ({ categories, filters, setFilters }) => {
 
         <Collapse 
           bordered={false} 
-          defaultActiveKey={['1', '2', '3', '4']}
+          defaultActiveKey={['1', '2', '3', '4', '5']} // Agregar '5' para el nuevo panel
           expandIcon={({ isActive }) => isActive ? <FiChevronUp /> : <FiChevronDown />}
           className="bg-transparent"
         >
-          <Panel header="Tipo de producto" key="1" className="border-b border-gray-200">
+          {/* Nuevo panel para el filtro de stock */}
+          <Panel header="Disponibilidad" key="1" className="border-b border-gray-200">
+            <div className="space-y-2">
+              <Checkbox
+                checked={hideOutOfStock}
+                onChange={handleStockFilterChange}
+                className="ant-checkbox-wrapper"
+              >
+                <span className={`${hideOutOfStock ? 'font-medium text-gray-800' : 'text-gray-600'}`}>
+                  Ocultar productos sin stock
+                </span>
+              </Checkbox>
+            </div>
+          </Panel>
+
+          <Panel header="Tipo de producto" key="2" className="border-b border-gray-200">
             <ul className="space-y-2">
               {productTypes.map(type => (
                 <li key={type.value} className="flex items-center">
@@ -163,7 +193,7 @@ const FilterSidebar = ({ categories, filters, setFilters }) => {
             </ul>
           </Panel>
 
-          <Panel header={`Categorías ${selectedCategories.length > 0 ? `(${selectedCategories.length})` : ''}`} key="2" className="border-b border-gray-200">
+          <Panel header={`Categorías ${selectedCategories.length > 0 ? `(${selectedCategories.length})` : ''}`} key="3" className="border-b border-gray-200">
             <div className="relative mb-3">
               <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
@@ -195,7 +225,7 @@ const FilterSidebar = ({ categories, filters, setFilters }) => {
             </ul>
           </Panel>
 
-          <Panel header="Rango de precios" key="3" className="border-b border-gray-200">
+          <Panel header="Rango de precios" key="4" className="border-b border-gray-200">
             <div className="px-2">
               <Slider
                 range
@@ -214,7 +244,7 @@ const FilterSidebar = ({ categories, filters, setFilters }) => {
             </div>
           </Panel>
 
-          <Panel header="Ordenar por" key="4">
+          <Panel header="Ordenar por" key="5">
             <Radio.Group 
               onChange={handleSortChange} 
               value={filters.sortBy}
