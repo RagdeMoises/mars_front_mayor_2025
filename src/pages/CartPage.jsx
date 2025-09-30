@@ -1,6 +1,6 @@
 import { useCart } from '../context/CartContext';
 import { Link } from 'react-router-dom';
-import { FiShoppingCart, FiTrash2, FiArrowLeft, FiX } from 'react-icons/fi';
+import { FiShoppingCart, FiTrash2, FiArrowLeft, FiX, FiMessageCircle } from 'react-icons/fi';
 import { useState } from 'react';
 import * as XLSX from 'xlsx';
 import Modal from 'react-modal';
@@ -23,6 +23,8 @@ const CartPage = () => {
   const [emailError, setEmailError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [checkoutMethod, setCheckoutMethod] = useState(''); // 'email' o 'whatsapp'
+  const [whatsappError, setWhatsappError] = useState(''); // Nuevo estado para errores de WhatsApp
 
   // Configuración del modal
   Modal.setAppElement('#root');
@@ -57,6 +59,57 @@ const CartPage = () => {
   const handleProceedToCheckout = () => {
     setIsModalOpen(true);
     setSuccessMessage('');
+    setCheckoutMethod(''); // Resetear método
+    setWhatsappError(''); // Limpiar errores
+  };
+
+  const handleWhatsAppCheckout = () => {
+    // Validar que el nombre del cliente esté completo
+    if (!clientName || clientName.trim().length < 2) {
+      setWhatsappError('Por favor ingrese su nombre completo');
+      return;
+    }
+
+    setWhatsappError('');
+
+    // Formatear el mensaje de WhatsApp de manera más profesional
+    const itemsText = cartItems.map(item => 
+      `🛒 *${item.title}*\n` +
+      `   ► SKU: ${item.sku}\n` +
+      `   Precio: $${item.price.toFixed(2)}\n` +
+      `   Cantidad: ${item.quantity}\n` +
+      `   Subtotal: $${(item.price * item.quantity).toFixed(2)}`
+    ).join('\n\n');
+
+    const message = 
+      `🎯 *NUEVO PEDIDO - TIENDAS MARS*\n\n` +
+      `📋 *DETALLE DEL PEDIDO:*\n\n${itemsText}\n\n` +
+      `💵 *TOTAL DEL PEDIDO: $${cartTotal.toFixed(2)}*\n\n` +
+      `👤 *INFORMACIÓN DEL CLIENTE:*\n` +
+      `   • *Nombre:* ${clientName}\n` +
+      `${clientPhone ? `   • *Teléfono:* ${clientPhone}\n` : ''}` +
+      `${observations ? `   • *Observaciones:* ${observations}` : ''}\n\n` +
+      `🕒 *FECHA: ${new Date().toLocaleDateString('es-ES', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      })}*\n\n` +
+      `📞 *Para confirmar este pedido, por favor responda a este mensaje.*\n` +
+      `¡Gracias! `;
+
+    // Codificar el mensaje para URL
+    const encodedMessage = encodeURIComponent(message);
+    
+    // Número de WhatsApp de la tienda
+    const whatsappNumber = '5491133269355'; // Número de Tiendas MARS
+    
+    // Crear enlace de WhatsApp
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodedMessage}`;
+    
+    // Abrir en nueva pestaña
+    window.open(whatsappUrl, '_blank');
   };
 
   const handleSubmitEmail = async (e) => {
@@ -68,6 +121,7 @@ const CartPage = () => {
     }
     
     setEmailError('');
+    setIsLoading(true);
     
     try {
       const response = await fetch(config.sendcartApi, {
@@ -104,6 +158,8 @@ const CartPage = () => {
     } catch (error) {
       console.error(error);
       setEmailError('Error al enviar el pedido. Por favor intente nuevamente.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -152,7 +208,7 @@ const CartPage = () => {
         isOpen={isModalOpen}
         onRequestClose={() => !isLoading && setIsModalOpen(false)}
         style={customStyles}
-        contentLabel="Ingrese su correo"
+        contentLabel="Confirmación de pedido"
         shouldCloseOnOverlayClick={!isLoading}
       >
         <div className="flex justify-between items-center mb-4">
@@ -175,98 +231,232 @@ const CartPage = () => {
             <p className="text-gray-600">{successMessage}</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmitEmail}>
-            <div className="mb-4">
-              <label htmlFor="email1" className="block text-sm font-medium text-gray-700 mb-2">
-                Correo electrónico de la tienda
-              </label>
-              <input
-                type="email"
-                id="email1"
-                value="coop.mars@outlook.com"
-                className="text-blue-600 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                placeholder="tucorreo@ejemplo.com"
-                disabled={true}
-              />
+          <>
+            {/* Selección de método de envío */}
+            {!checkoutMethod && (
+              <div className="mb-6">
+                <h3 className="text-lg font-medium text-gray-800 mb-4">¿Cómo prefieres enviar tu pedido?</h3>
+                <div className="grid grid-cols-1 gap-4">
+                  <button
+                    onClick={() => setCheckoutMethod('email')}
+                    className="flex items-center p-4 border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
+                  >
+                    <div className="flex-1 text-left">
+                      <h4 className="font-medium text-gray-800">Enviar por correo electrónico</h4>
+                      <p className="text-sm text-gray-600">Recibirás un archivo Excel con tu pedido</p>
+                    </div>
+                  </button>
+                  
+                  <button
+                    onClick={() => setCheckoutMethod('whatsapp')}
+                    className="flex items-center p-4 border border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors"
+                  >
+                    <FiMessageCircle className="text-green-500 text-xl mr-3" />
+                    <div className="flex-1 text-left">
+                      <h4 className="font-medium text-gray-800">Enviar por WhatsApp</h4>
+                      <p className="text-sm text-gray-600">Enviar pedido directamente por WhatsApp</p>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            )}
 
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2 mt-4">
-                Ingrese su Correo electrónico (Cliente)*
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                placeholder="tucorreo@ejemplo.com"
-                required
-                disabled={isLoading}
-              />
-              {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
+            {/* Formulario para Email */}
+            {checkoutMethod === 'email' && (
+              <form onSubmit={handleSubmitEmail}>
+                <div className="mb-4">
+                  <label htmlFor="email1" className="block text-sm font-medium text-gray-700 mb-2">
+                    Correo electrónico de la tienda
+                  </label>
+                  <input
+                    type="email"
+                    id="email1"
+                    value="coop.mars@outlook.com"
+                    className="text-blue-600 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="tucorreo@ejemplo.com"
+                    disabled={true}
+                  />
 
-              <label htmlFor="clientName" className="block text-sm font-medium text-gray-700 mb-2 mt-4">
-                Nombre del cliente (opcional)
-              </label>
-              <input
-                type="text"
-                id="clientName"
-                value={clientName}
-                onChange={(e) => setClientName(e.target.value)}
-                className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Nombre completo"
-                disabled={isLoading}
-              />
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2 mt-4">
+                    Ingrese su Correo electrónico (Cliente)*
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="tucorreo@ejemplo.com"
+                    required
+                    disabled={isLoading}
+                  />
+                  {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
 
-              <label htmlFor="clientPhone" className="block text-sm font-medium text-gray-700 mb-2 mt-4">
-                Teléfono/Celular (opcional)
-              </label>
-              <input
-                type="tel"
-                id="clientPhone"
-                value={clientPhone}
-                onChange={(e) => setClientPhone(e.target.value)}
-                className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Número de contacto"
-                disabled={isLoading}
-              />
+                  <label htmlFor="clientName" className="block text-sm font-medium text-gray-700 mb-2 mt-4">
+                    Nombre del cliente (opcional)
+                  </label>
+                  <input
+                    type="text"
+                    id="clientName"
+                    value={clientName}
+                    onChange={(e) => setClientName(e.target.value)}
+                    className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Nombre completo"
+                    disabled={isLoading}
+                  />
 
-              <label htmlFor="observations" className="block text-sm font-medium text-gray-700 mb-2 mt-4">
-                Observaciones (opcional)
-              </label>
-              <textarea
-                id="observations"
-                value={observations}
-                onChange={(e) => setObservations(e.target.value)}
-                className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Alguna observación sobre el pedido"
-                rows="3"
-                disabled={isLoading}
-              />
-            </div>
-            
-            <p className="text-sm text-gray-500 mb-6">
-              * Campos obligatorios
-            </p>
-            
-            <div className="flex justify-end space-x-3">
-              {!isLoading && (
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="text-gray-600 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                >
-                  Cancelar
-                </button>
-              )}
-              <button
-                type="submit"
-                className={`px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors ${isLoading ? 'opacity-75 cursor-not-allowed' : ''}`}
-                disabled={isLoading}
-              >
-                {isLoading ? 'Enviando...' : 'Confirmar Pedido'}
-              </button>
-            </div>
-          </form>
+                  <label htmlFor="clientPhone" className="block text-sm font-medium text-gray-700 mb-2 mt-4">
+                    Teléfono/Celular (opcional)
+                  </label>
+                  <input
+                    type="tel"
+                    id="clientPhone"
+                    value={clientPhone}
+                    onChange={(e) => setClientPhone(e.target.value)}
+                    className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Número de contacto"
+                    disabled={isLoading}
+                  />
+
+                  <label htmlFor="observations" className="block text-sm font-medium text-gray-700 mb-2 mt-4">
+                    Observaciones (opcional)
+                  </label>
+                  <textarea
+                    id="observations"
+                    value={observations}
+                    onChange={(e) => setObservations(e.target.value)}
+                    className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="Alguna observación sobre el pedido"
+                    rows="3"
+                    disabled={isLoading}
+                  />
+                </div>
+                
+                <p className="text-sm text-gray-500 mb-6">
+                  * Campos obligatorios
+                </p>
+                
+                <div className="flex justify-end space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => setCheckoutMethod('')}
+                    className="text-gray-600 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                    disabled={isLoading}
+                  >
+                    Atrás
+                  </button>
+                  {!isLoading && (
+                    <button
+                      type="button"
+                      onClick={() => setIsModalOpen(false)}
+                      className="text-gray-600 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                    >
+                      Cancelar
+                    </button>
+                  )}
+                  <button
+                    type="submit"
+                    className={`px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors ${isLoading ? 'opacity-75 cursor-not-allowed' : ''}`}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Enviando...' : 'Confirmar Pedido'}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* Formulario para WhatsApp - Nombre obligatorio */}
+            {checkoutMethod === 'whatsapp' && (
+              <div>
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                  <div className="flex items-center">
+                    <FiMessageCircle className="text-green-500 text-xl mr-3" />
+                    <div>
+                      <h4 className="font-medium text-green-800">Enviar por WhatsApp</h4>
+                      <p className="text-sm text-green-600">
+                        Tu pedido se enviará directamente por WhatsApp. Ingresa tu nombre para identificarte.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <label htmlFor="whatsappClientName" className="block text-sm font-medium text-gray-700 mb-2">
+                    Nombre del cliente *
+                  </label>
+                  <input
+                    type="text"
+                    id="whatsappClientName"
+                    value={clientName}
+                    onChange={(e) => {
+                      setClientName(e.target.value);
+                      setWhatsappError(''); // Limpiar error al escribir
+                    }}
+                    className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                    placeholder="Ingresa tu nombre completo"
+                    required
+                  />
+                  {whatsappError && <p className="text-red-500 text-sm mt-1">{whatsappError}</p>}
+                </div>
+
+                {/* <div className="mb-4">
+                  <label htmlFor="whatsappClientPhone" className="block text-sm font-medium text-gray-700 mb-2">
+                    Teléfono/Celular (opcional)
+                  </label>
+                  <input
+                    type="tel"
+                    id="whatsappClientPhone"
+                    value={clientPhone}
+                    onChange={(e) => setClientPhone(e.target.value)}
+                    className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                    placeholder="Número de contacto"
+                  />
+                </div> */}
+
+                {/* <div className="mb-6">
+                  <label htmlFor="whatsappObservations" className="block text-sm font-medium text-gray-700 mb-2">
+                    Observaciones (opcional)
+                  </label>
+                  <textarea
+                    id="whatsappObservations"
+                    value={observations}
+                    onChange={(e) => setObservations(e.target.value)}
+                    className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                    placeholder="Alguna observación sobre el pedido..."
+                    rows="3"
+                  />
+                </div> */}
+                
+                <p className="text-sm text-gray-500 mb-6">
+                  * Campo obligatorio
+                </p>
+                
+                <div className="flex justify-end space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => setCheckoutMethod('')}
+                    className="text-gray-600 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                  >
+                    Atrás
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="text-gray-600 px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleWhatsAppCheckout}
+                    className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors flex items-center"
+                  >
+                    <FiMessageCircle className="mr-2" />
+                    Enviar por WhatsApp
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </Modal>
 
@@ -346,9 +536,25 @@ const CartPage = () => {
           
           <button 
             onClick={handleProceedToCheckout}
-            className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg mb-3 transition-colors"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg mb-3 transition-colors flex items-center justify-center"
           >
+            <FiShoppingCart className="mr-2" />
             Proceder con el pedido
+          </button>
+
+          <button 
+            onClick={() => {
+              setCheckoutMethod('whatsapp');
+              setIsModalOpen(true);
+              setClientName(''); // Limpiar nombre anterior
+              setClientPhone(''); // Limpiar teléfono anterior
+              setObservations(''); // Limpiar observaciones anteriores
+              setWhatsappError(''); // Limpiar errores
+            }}
+            className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg mb-3 transition-colors flex items-center justify-center"
+          >
+            <FiMessageCircle className="mr-2" />
+            Enviar por WhatsApp
           </button>
           
           <button
