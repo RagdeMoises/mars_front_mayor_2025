@@ -18,7 +18,8 @@ const CatalogPage = () => {
     priceRange: [0, 150000],
     searchQuery: '',
     productTypes: [],
-    sortBy: ''
+    sortBy: '',
+    hideOutOfStock: true // Agregar el nuevo filtro con valor por defecto true
   });
 
   const [searchInput, setSearchInput] = useState("");
@@ -28,6 +29,7 @@ const CatalogPage = () => {
   const searchTimeoutRef = useRef(null);
   const scrollDebounceRef = useRef(null);
   console.log("products:", products);
+
   const fetchProducts = async (pageNumber = 1, filters = {}) => {
     try {
       const queryParams = new URLSearchParams({
@@ -38,7 +40,8 @@ const CatalogPage = () => {
         ...(filters.sortBy && { sortBy: filters.sortBy }),
         min_price: filters.priceRange[0],
         max_price: filters.priceRange[1],
-        ...(filters.productTypes.length > 0 && { productTypes: filters.productTypes.join(',') })
+        ...(filters.productTypes.length > 0 && { productTypes: filters.productTypes.join(',') }),
+        ...(filters.hideOutOfStock && { hideOutOfStock: 'true' }) // Agregar el parámetro al API
       });
 
       const response = await fetch(`${API_URL}?${queryParams}`);
@@ -165,6 +168,18 @@ const CatalogPage = () => {
     }
   };
 
+  // Función para aplicar filtro de stock en el frontend (como respaldo)
+  const getFilteredProducts = (products) => {
+    // Si el API ya filtra por stock, no es necesario hacerlo aquí
+    // Pero lo dejamos como respaldo por si el API no soporta el filtro
+    if (filters.hideOutOfStock) {
+      return products.filter(product => product.stock > 0);
+    }
+    return products;
+  };
+
+  const displayedProducts = getFilteredProducts(products);
+
   if (loading && page === 1) {
     return (
       <div className="flex flex-col justify-center items-center h-screen">
@@ -205,10 +220,11 @@ const CatalogPage = () => {
             />
           </div>
 
-          {products.length > 0 && (
+          {displayedProducts.length > 0 && (
             <div className="flex justify-between items-center mb-4">
               <span className="text-gray-600">
-                Mostrando {products.length} de {totalProducts} productos
+                Mostrando {displayedProducts.length} de {totalProducts} productos
+                {filters.hideOutOfStock && " (sin productos sin stock)"}
               </span>
               <span className="text-sm text-gray-500">
                 Página {page} de {Math.ceil(totalProducts / productsPerPage)}
@@ -216,10 +232,10 @@ const CatalogPage = () => {
             </div>
           )}
 
-          {products.length > 0 ? (
+          {displayedProducts.length > 0 ? (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {products.map((product) => (
+                {displayedProducts.map((product) => (
                   <ProductCard 
                     key={`${product.id}_${product.sku}_${product.updatedAt || ''}`}
                     product={product} 
@@ -236,6 +252,7 @@ const CatalogPage = () => {
               {!hasMore && totalProducts > 0 && (
                 <div className="text-center text-gray-500 my-8">
                   Has visto todos los {totalProducts} productos
+                  {filters.hideOutOfStock && " (sin productos sin stock)"}
                 </div>
               )}
             </>
@@ -249,7 +266,10 @@ const CatalogPage = () => {
                     No se encontraron productos
                   </h3>
                   <p className="text-gray-500">
-                    Intenta ajustar tus filtros de búsqueda
+                    {filters.hideOutOfStock 
+                      ? "Intenta ajustar tus filtros de búsqueda o mostrar productos sin stock" 
+                      : "Intenta ajustar tus filtros de búsqueda"
+                    }
                   </p>
                 </div>
               )}
