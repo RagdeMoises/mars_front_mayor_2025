@@ -481,7 +481,7 @@ const CartPage = () => {
               <img
                 src={`https://backmars2025-production.up.railway.app/images/${item.sku}.jpg` || 'https://backmars2025-production.up.railway.app/images/esqueleto.jpg'} 
                 alt={item.title}
-                className="w-full sm:w-32 h-32 object-contain bg-gray-100 rounded-lg mb-4 sm:mb-0"
+                className="w-full sm:w-32 h-32 object-contain rounded-lg mb-4 sm:mb-0"
                 onError={(e) => { e.target.onerror = null; e.target.src = 'https://backmars2025-production.up.railway.app/images/esqueleto.jpg'; }}
               />
               
