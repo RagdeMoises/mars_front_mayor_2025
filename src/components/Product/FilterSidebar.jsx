@@ -107,7 +107,7 @@ const FilterSidebar = ({ categories, filters, setFilters }) => {
     <>
       <button 
         onClick={toggleMobileFilters}
-        className="md:hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full shadow-lg flex items-center z-30 transition-colors"
+        className="md:hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-full shadow-lg flex items-center z-30 transition-colors"
       >
         <FiFilter className="mr-2" />
         Filtros
