@@ -4,24 +4,61 @@ const CartContext = createContext();
 
 const cartReducer = (state, action) => {
   switch (action.type) {
+    case 'INIT_CART':
+      return { ...state, items: action.payload };
+      
     case 'ADD_ITEM':
-      // Lógica para agregar item al carrito
-      return { ...state, items: [...state.items, action.payload] };
+      const existingItemIndex = state.items.findIndex(
+        item => item.id === action.payload.id
+      );
+
+      if (existingItemIndex !== -1) {
+        // Si el producto ya existe, incrementar la cantidad
+        return {
+          ...state,
+          items: state.items.map((item, index) => {
+            if (index === existingItemIndex) {
+              const newQuantity = item.quantity + action.payload.quantity;
+              // Verificar que no exceda el stock disponible
+              const finalQuantity = Math.min(newQuantity, item.stock);
+              return {
+                ...item,
+                quantity: finalQuantity
+              };
+            }
+            return item;
+          })
+        };
+      } else {
+        // Si el producto no existe, agregarlo al carrito
+        return { 
+          ...state, 
+          items: [...state.items, action.payload] 
+        };
+      }
+      
     case 'REMOVE_ITEM':
-      // Lógica para remover item
-      return { ...state, items: state.items.filter(item => item.id !== action.payload) };
+      return { 
+        ...state, 
+        items: state.items.filter(item => item.id !== action.payload) 
+      };
+      
     case 'UPDATE_QUANTITY':
-      // Lógica para actualizar cantidad
       return {
         ...state,
         items: state.items.map(item =>
           item.id === action.payload.id
-            ? { ...item, quantity: action.payload.quantity }
+            ? { 
+                ...item, 
+                quantity: Math.min(action.payload.quantity, item.stock) 
+              }
             : item
         )
       };
+      
     case 'CLEAR_CART':
       return { ...state, items: [] };
+      
     default:
       return state;
   }
@@ -50,7 +87,7 @@ export const CartProvider = ({ children }) => {
         sku: product.sku,
         title: product.titulo,
         price: parseFloat(product.precio_mayorista),
-        quantity,
+        quantity: quantity,
         image: product.image || '/default-product.jpg',
         stock: product.stock
       }
