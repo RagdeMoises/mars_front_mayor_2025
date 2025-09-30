@@ -398,34 +398,6 @@ const CartPage = () => {
                   />
                   {whatsappError && <p className="text-red-500 text-sm mt-1">{whatsappError}</p>}
                 </div>
-
-                {/* <div className="mb-4">
-                  <label htmlFor="whatsappClientPhone" className="block text-sm font-medium text-gray-700 mb-2">
-                    Teléfono/Celular (opcional)
-                  </label>
-                  <input
-                    type="tel"
-                    id="whatsappClientPhone"
-                    value={clientPhone}
-                    onChange={(e) => setClientPhone(e.target.value)}
-                    className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
-                    placeholder="Número de contacto"
-                  />
-                </div> */}
-
-                {/* <div className="mb-6">
-                  <label htmlFor="whatsappObservations" className="block text-sm font-medium text-gray-700 mb-2">
-                    Observaciones (opcional)
-                  </label>
-                  <textarea
-                    id="whatsappObservations"
-                    value={observations}
-                    onChange={(e) => setObservations(e.target.value)}
-                    className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
-                    placeholder="Alguna observación sobre el pedido..."
-                    rows="3"
-                  />
-                </div> */}
                 
                 <p className="text-sm text-gray-500 mb-6">
                   * Campo obligatorio
@@ -474,44 +446,62 @@ const CartPage = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Lista de productos */}
-        <div className="lg:col-span-2 bg-white rounded-lg shadow-sm divide-y divide-gray-200">
+        {/* Lista de productos - Con bordes más prominentes */}
+        <div className="lg:col-span-2">
           {cartItems.map((item) => (
-            <div key={item.id} className="p-4 flex flex-col sm:flex-row">
-              <img
-                src={`https://backmars2025-production.up.railway.app/images/${item.sku}.jpg` || 'https://backmars2025-production.up.railway.app/images/esqueleto.jpg'} 
-                alt={item.title}
-                className="w-full sm:w-32 h-32 object-contain rounded-lg mb-4 sm:mb-0"
-                onError={(e) => { e.target.onerror = null; e.target.src = 'https://backmars2025-production.up.railway.app/images/esqueleto.jpg'; }}
-              />
-              
-              <div className="flex-1 sm:ml-6">
-                <div className="flex justify-between">
-                  <h3 className="text-lg font-medium text-gray-900">{item.title}</h3>
-                  <p className="text-lg font-semibold text-gray-900">${item.price.toFixed(2)}</p>
-                </div>
+            <div 
+              key={item.id} 
+              className="bg-white rounded-xl shadow-md border-2 border-gray-100 mb-6 p-6 hover:shadow-lg transition-shadow duration-300"
+            >
+              <div className="flex flex-col sm:flex-row">
+                <img
+                  src={`https://backmars2025-production.up.railway.app/images/${item.sku}.jpg` || 'https://backmars2025-production.up.railway.app/images/esqueleto.jpg'} 
+                  alt={item.title}
+                  className="w-full sm:w-32 h-32 object-contain rounded-lg mb-4 sm:mb-0 border border-gray-200"
+                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://backmars2025-production.up.railway.app/images/esqueleto.jpg'; }}
+                />
                 
-                <p className="text-sm text-gray-500 mt-1">SKU: {item.sku}</p>
-                
-                <div className="text-gray-600 mt-4 flex items-center">
-                  <label htmlFor={`quantity-${item.id}`} className="sr-only">Cantidad</label>
-                  <input
-                    id={`quantity-${item.id}`}
-                    type="number"
-                    min="1"
-                    max={item.stock}
-                    value={item.quantity}
-                    onChange={(e) => updateQuantity(item.id, parseInt(e.target.value))}
-                    className="w-20 px-3 py-1 border border-gray-300 rounded-md text-center"
-                  />
+                <div className="flex-1 sm:ml-6">
+                  <div className="flex justify-between items-start mb-3">
+                    <h3 className="text-lg font-semibold text-gray-900">{item.title}</h3>
+                    <p className="text-lg font-bold text-blue-600">${item.price.toFixed(2)}</p>
+                  </div>
                   
-                  <button
-                    onClick={() => removeFromCart(item.id)}
-                    className="ml-4 text-red-500 hover:text-red-700 flex items-center"
-                  >
-                    <FiTrash2 className="mr-1" />
-                    Eliminar
-                  </button>
+                  <p className="text-sm text-gray-500 mb-4">SKU: {item.sku}</p>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <label htmlFor={`quantity-${item.id}`} className="text-sm font-medium text-gray-700">
+                        Cantidad:
+                      </label>
+                      <input
+                        id={`quantity-${item.id}`}
+                        type="number"
+                        min="1"
+                        max={item.stock}
+                        value={item.quantity}
+                        onChange={(e) => updateQuantity(item.id, parseInt(e.target.value))}
+                        className="w-20 px-3 py-2 border-2 border-gray-300 rounded-lg text-center focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                      />
+                    </div>
+                    
+                    <button
+                      onClick={() => removeFromCart(item.id)}
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50 px-3 py-2 rounded-lg transition-colors flex items-center border border-red-200"
+                    >
+                      <FiTrash2 className="mr-2" />
+                      Eliminar
+                    </button>
+                  </div>
+                  
+                  {/* Subtotal por producto */}
+                  <div className="mt-4 pt-3 border-t border-gray-200">
+                    <p className="text-sm text-gray-600">
+                      Subtotal: <span className="font-semibold text-gray-800">
+                        ${(item.price * item.quantity).toFixed(2)}
+                      </span>
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -519,24 +509,24 @@ const CartPage = () => {
         </div>
 
         {/* Resumen del pedido */}
-        <div className="bg-white rounded-lg shadow-sm p-6 h-fit sticky top-4">
+        <div className="bg-white rounded-xl shadow-lg border-2 border-gray-100 p-6 h-fit sticky top-4">
           <h2 className="text-xl font-bold text-gray-800 mb-6">Resumen del pedido</h2>
           
-          <div className="flex justify-between mb-2">
+          <div className="flex justify-between mb-3">
             <span className="text-gray-600">Subtotal</span>
-            <span className="text-gray-600 font-medium">${cartTotal.toFixed(2)}</span>
+            <span className="text-gray-700 font-medium">${cartTotal.toFixed(2)}</span>
           </div>
           
-          <div className="border-t border-gray-200 my-4"></div>
+          <div className="border-t-2 border-gray-200 my-4"></div>
           
-          <div className="text-gray-600 flex justify-between text-lg font-bold mb-6">
-            <span>Total</span>
-            <span>${cartTotal.toFixed(2)}</span>
+          <div className="flex justify-between text-lg font-bold mb-6">
+            <span className="text-gray-800">Total</span>
+            <span className="text-blue-600">${cartTotal.toFixed(2)}</span>
           </div>
           
           <button 
             onClick={handleProceedToCheckout}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg mb-3 transition-colors flex items-center justify-center"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg mb-3 transition-colors flex items-center justify-center shadow-md hover:shadow-lg"
           >
             <FiShoppingCart className="mr-2" />
             Proceder con el pedido
@@ -551,7 +541,7 @@ const CartPage = () => {
               setObservations(''); // Limpiar observaciones anteriores
               setWhatsappError(''); // Limpiar errores
             }}
-            className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg mb-3 transition-colors flex items-center justify-center"
+            className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg mb-3 transition-colors flex items-center justify-center shadow-md hover:shadow-lg"
           >
             <FiMessageCircle className="mr-2" />
             Enviar por WhatsApp
@@ -559,7 +549,7 @@ const CartPage = () => {
           
           <button
             onClick={clearCart}
-            className="w-full text-red-500 hover:text-red-700 font-medium py-2 px-4 border border-red-300 rounded-lg hover:bg-red-50 transition-colors flex items-center justify-center"
+            className="w-full text-red-500 hover:text-red-700 font-medium py-2 px-4 border-2 border-red-300 rounded-lg hover:bg-red-50 transition-colors flex items-center justify-center"
           >
             <FiTrash2 className="mr-2" />
             Vaciar pedido
