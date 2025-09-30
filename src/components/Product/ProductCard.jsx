@@ -66,7 +66,7 @@ const ProductCard = ({ product }) => {
           </span>
           
           <h3 className="text-lg font-semibold text-gray-800 mb-1">{product.titulo}</h3>
-          <p className="text-xs text-gray-500 mb-1">SKU: {product.id}</p>
+          <p className="text-xs text-gray-500 mb-1">SKU: {product.sku}</p>
           
           {product.precio_especial && product.precio_especial !== "0.00" ? (
             <div className="flex items-center gap-2">
